@@ -1,0 +1,95 @@
+<?php
+
+namespace Tests\Feature\Booking;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+use App\Models\TicketType;
+use App\Models\Order;
+use Illuminate\Support\Facades\Http;
+
+class TicketBookingTest extends TestCase
+{
+    use RefreshDatabase, WithFaker;
+
+    /** @test */
+    public function it_can_book_a_ticket_successfully(){
+        // Create a ticket type
+        $ticketType = TicketType::create([
+            'name' => 'VIP',
+            'price' => 500000,
+            'quota' => 100,
+            'remaining_stock' => 100,
+        ]);
+
+        // Mock Midtrans API response for token generation
+        Http::fake([
+            'https://app.sandbox.midtrans.com/snap/v1/transactions' => Http::response([
+                'token' => 'mock_snap_token',
+                'redirect_url' => 'http://example.com/payment/redirect',
+            ]),
+        ]);
+
+        // Data for booking
+        $bookingData = [
+            'full_name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'phone' => $this->faker->phoneNumber,
+            'ticket_type_id' => $ticketType->id,
+            'quantity' => 2,
+        ];
+
+        // Book the ticket
+        $response = $this->postJson('/tickets/book', $bookingData);
+
+        // Assert response
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['order_id', 'snap_token', 'total_price']);
+
+        // Assert order was created in the database
+        $this->assertDatabaseHas('orders', [
+            'user_name' => $bookingData['full_name'],
+            'email' => $bookingData['email'],
+            'ticket_type_id' => $ticketType->id,
+            'quantity' => $bookingData['quantity'],
+            'total_price' => $ticketType->price * $bookingData['quantity'],
+            'payment_status' => 'pending',
+        ]);
+
+        // Assert ticket stock was decremented
+        $updatedTicketType = TicketType::find($ticketType->id);
+        $this->assertEquals($ticketType->remaining_stock - $bookingData['quantity'], $updatedTicketType->remaining_stock);
+    }
+
+    /** @test */
+    public function it_fails_to_book_if_stock_is_insufficient(){
+        // Create a ticket type with low stock
+        $ticketType = TicketType::create([
+            'name' => 'VIP',
+            'price' => 500000,
+            'quota' => 1,
+            'remaining_stock' => 1,
+        ]);
+
+        // Data for booking more tickets than available
+        $bookingData = [
+            'full_name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'phone' => $this->faker->phoneNumber,
+            'ticket_type_id' => $ticketType->id,
+            'quantity' => 2,
+        ];
+
+        // Attempt to book tickets
+        $response = $this->postJson('/tickets/book', $bookingData);
+
+        // Assert response indicates insufficient stock
+        $response->assertStatus(422);
+        $response->assertJson(['error' => 'Insufficient stock for selected ticket type']);
+
+        // Assert order was not created and stock remains the same
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertEquals(1, $ticketType->remaining_stock);
+    }
+}
