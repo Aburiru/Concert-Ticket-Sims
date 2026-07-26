@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Google Fonts - Must be at the top */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@700&display=swap');
+
+/* Content Paths for Tailwind */
+@source '../views/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* Theme Configuration */
+@theme {
+    /* Primary Colors */
+    --color-yellow: #FFD43B;
+    --color-cyan: #4CC9F0;
+    --color-pink: #FF4D8D;
+    
+    /* Semantic Colors */
+    --color-success: #6BCB77;
+    --color-warning: #FF922B;
+    --color-danger: #FF6B6B;
+    
+    /* Neutral Colors */
+    --color-surface: #F8F9FA;
+    --color-background: #FFFFFF;
+    --color-text: #111111;
+    --color-border: #000000;
+    
+    /* Typography */
+    --font-family-poppins: 'Poppins', sans-serif;
+    --font-family-inter: 'Inter', sans-serif;
+    
+    /* Shadows */
+    --shadow-neobrutalism: 6px 6px 0px 0px #000000;
+    
+    /* Border Radius */
+    --radius-btn: 16px;
+    --radius-card: 20px;
+    --radius-modal: 24px;
+    
+    /* Border Width */
+    --border-width-3: 3px;
+    --border-width-4: 4px;
+}
