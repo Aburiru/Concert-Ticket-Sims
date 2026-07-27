@@ -53,10 +53,6 @@ Sistem ini dirancang untuk mengatasi permasalahan tersebut dengan menyediakan pr
 
 Pengguna yang ingin membeli tiket konser.
 
-### Admin
-
-Panitia atau penyelenggara konser yang mengelola tiket dan transaksi.
-
 ---
 
 # 5. User Flow
@@ -239,57 +235,6 @@ Informasi tiket:
 - Status tiket
     
 
----
-
-## Dashboard Admin
-
-Admin dapat:
-
-### Kelola Tiket
-
-- Tambah jenis tiket
-    
-- Edit harga
-    
-- Atur kuota
-    
-- Tutup penjualan
-    
-
-### Kelola Transaksi
-
-- Melihat seluruh transaksi
-    
-- Filter berdasarkan status
-    
-- Detail pembeli
-    
-
-### Kelola Pembeli
-
-- Daftar pembeli
-    
-- Detail tiket
-    
-- Riwayat transaksi
-    
-
-### Dashboard Statistik
-
-Menampilkan:
-
-- Total tiket terjual
-    
-- Pendapatan
-    
-- Tiket tersisa
-    
-- Jumlah transaksi berhasil
-    
-- Jumlah transaksi pending
-    
-- Grafik penjualan
-    
 
 ---
 
@@ -422,8 +367,6 @@ Digunakan untuk:
 # 10. Future Features
 
 Versi berikutnya dapat menambahkan:
-
-- Login pengguna
     
 - Riwayat pembelian
     
@@ -504,8 +447,6 @@ Proyek dianggap berhasil apabila:
 - Pembayaran berhasil diproses melalui Midtrans.
     
 - E-Ticket diterbitkan secara otomatis setelah pembayaran sukses.
-    
-- Admin dapat memantau seluruh transaksi secara real-time.
     
 - Sistem mampu menangani proses pembelian dengan aman dan stabil.
 
@@ -828,11 +769,7 @@ Komponen yang harus mengikuti desain Neobrutalism:
     
 - Dashboard Card
     
-- Table Admin
-    
 - Statistics Card
-    
-- Sidebar Admin
     
 - Pagination
     

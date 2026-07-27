@@ -1,63 +1,62 @@
-<div class="max-w-2xl mx-auto bg-white border-4 border-black rounded-3xl p-10 shadow-neobrutalism text-center">
-    <div class="mb-8">
-        <div class="text-5xl font-poppins font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500 mb-4">
-            E-Ticket Confirmed!
-        </div>
-        <p class="text-xl font-medium text-text/70">Your {{ $order->ticketType->name }} ticket is ready.</p>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Ticket - {{ $order->ticket_id }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="antialiased font-sans bg-surface text-text">
+    <div class="max-w-3xl mx-auto px-6 py-12">
+        <div class="bg-background rounded-4xl p-10 shadow-bento-lg text-center">
+            <h1 class="text-4xl font-extrabold text-primary mb-4">E-Ticket Confirmed!</h1>
+            <p class="text-text/70 text-lg mb-8">Your ticket for the event is ready.</p>
 
-    <div class="bg-surface border-3 border-black rounded-2xl p-8 mb-8">
-        <h3 class="font-poppins text-2xl font-bold uppercase mb-6">Ticket Details</h3>
-        
-        <div class="grid grid-cols-2 gap-6 text-left">
-            <div>
-                <p class="text-sm uppercase text-text/60 mb-1">Ticket ID</p>
-                <p class="font-bold text-lg">{{ $order->ticket_id }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-left">
+                <!-- QR Code Card -->
+                <div class="bg-surface rounded-3xl p-6 shadow-bento flex flex-col items-center justify-center">
+                    <h3 class="font-bold text-xl mb-4">Scan QR Code</h3>
+                    <img src="/ticket/{{ $order->ticket_id }}/qrcode" alt="Ticket QR Code" class="w-48 h-48 rounded-xl bg-white p-2 shadow-sm mb-4">
+                    <p class="text-sm text-text/60">Show this at the entrance.</p>
+                </div>
+
+                <!-- Ticket Details Summary -->
+                <div class="bg-surface rounded-3xl p-6 shadow-bento space-y-4">
+                    <h3 class="font-bold text-xl mb-4">Details</h3>
+                    <div><p class="text-sm text-text/50 uppercase">Ticket ID</p><p class="font-bold">{{ $order->ticket_id }}</p></div>
+                    <div><p class="text-sm text-text/50 uppercase">Buyer Name</p><p class="font-bold">{{ $order->user_name }}</p></div>
+                    <div><p class="text-sm text-text/50 uppercase">Ticket Type</p><p class="font-bold">{{ $order->ticketType->name }}</p></div>
+                    <div><p class="text-sm text-text/50 uppercase">Quantity</p><p class="font-bold">{{ $order->quantity }}</p></div>
+                </div>
             </div>
-            <div>
-                <p class="text-sm uppercase text-text/60 mb-1">Date</p>
-                <p class="font-bold text-lg">{{ now()->format('M d, Y') }}</p>
+
+            <!-- Event Details Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 text-left">
+                <div class="bg-surface rounded-3xl p-6 shadow-bento">
+                    <p class="text-sm text-text/50 uppercase">Event Name</p>
+                    <p class="font-bold text-lg">{{ $order->ticketType->event_name }}</p>
+                </div>
+                <div class="bg-surface rounded-3xl p-6 shadow-bento">
+                    <p class="text-sm text-text/50 uppercase">Date & Time</p>
+                    <p class="font-bold text-lg">{{ \Carbon\Carbon::parse($order->ticketType->event_date)->format('F j, Y - H:i') }} WIB</p>
+                </div>
+                <div class="bg-surface rounded-3xl p-6 shadow-bento">
+                    <p class="text-sm text-text/50 uppercase">Location</p>
+                    <p class="font-bold text-lg">{{ $order->ticketType->event_location }}</p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm uppercase text-text/60 mb-1">Event</p>
-                <p class="font-bold text-lg">{{ $order->ticketType->name }}</p>
-            </div>
-            <div>
-                <p class="text-sm uppercase text-text/60 mb-1">Time</p>
-                <p class="font-bold text-lg">{{ now()->format('H:i') }} WIB</p>
-            </div>
-            <div>
-                <p class="text-sm uppercase text-text/60 mb-1">Buyer Name</p>
-                <p class="font-bold text-lg">{{ $order->user_name }}</p>
-            </div>
-            <div>
-                <p class="text-sm uppercase text-text/60 mb-1">Ticket Quantity</p>
-                <p class="font-bold text-lg">{{ $order->quantity }} {{ $order->ticketType->name }} Ticket{{ $order->quantity > 1 ? 's' : '' }}</p>
+
+            <div class="flex justify-center gap-4">
+                <button onclick="window.print()" class="bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-bento hover:shadow-bento-hover hover:-translate-y-0.5 transition-all">
+                    <i data-lucide="printer" class="w-5 h-5 inline-block mr-2"></i> Print Ticket
+                </button>
+                <a href="/download-ticket/{{ $order->ticket_id }}" class="bg-accent text-white px-6 py-3 rounded-xl font-bold shadow-bento hover:shadow-bento-hover hover:-translate-y-0.5 transition-all inline-flex items-center">
+                    <i data-lucide="download" class="w-5 h-5 inline-block mr-2"></i> Download PDF
+                </a>
             </div>
         </div>
     </div>
-
-    <div class="bg-white border-4 border-black rounded-2xl p-8 mb-8">
-        <h3 class="font-poppins text-2xl font-bold uppercase mb-6">QR Code</h3>
-        <div class="flex justify-center">
-            <img src="/ticket/{{ $order->ticket_id }}/qrcode" alt="Ticket QR Code" class="w-48 h-48 border-2 border-black rounded-lg">
-        </div>
-        <p class="text-sm text-text/60 mt-4">Show this QR code at the venue entrance for check-in.</p>
-    </div>
-
-    <div class="flex flex-wrap justify-center gap-4">
-        <button onclick="window.print()" class="bg-black text-white font-poppins font-bold uppercase px-8 py-4 rounded-xl border-4 border-black shadow-neobrutalism hover:translate-x-1 hover:translate-y-1 active:translate-x-2 active:translate-y-2 transition-all">
-            Print Ticket
-        </button>
-        <a href="/download-ticket/{{ $order->ticket_id }}" class="bg-cyan text-black font-poppins font-bold uppercase px-8 py-4 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 active:translate-x-2 active:translate-y-2 transition-all inline-block">
-            Download as PDF
-        </a>
-    </div>
-</div>
-<style>
-@media print {
-    body { margin: 0; }
-    .max-w-2xl { max-width: none; margin: 0; border: none; box-shadow: none; }
-    button, a { display: none; }
-}
-</style>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

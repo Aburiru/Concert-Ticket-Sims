@@ -15,9 +15,9 @@ class TicketController extends Controller
     public function __construct()
     {
         Config::$serverKey = config('services.midtrans.server_key');
-        Config::$isProduction = config('services.midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
+        Config::$isProduction = (bool) config('services.midtrans.is_production');
+        Config::$isSanitized = (bool) config('services.midtrans.is_sanitized');
+        Config::$is3ds = (bool) config('services.midtrans.is_3ds');
     }
 
     /**
@@ -56,6 +56,10 @@ class TicketController extends Controller
             $ticketId = 'TIX-' . strtoupper(Str::random(8));
 
             // Create Order
+            $subtotal = $ticketType->price * $validated['quantity'];
+            $adminFee = (float) config('app.admin_fee', 0);
+            $totalPrice = $subtotal + $adminFee;
+
             $order = Order::create([
                 'ticket_id' => $ticketId,
                 'user_name' => $validated['full_name'],
@@ -63,7 +67,8 @@ class TicketController extends Controller
                 'phone' => $validated['phone'],
                 'ticket_type_id' => $ticketType->id,
                 'quantity' => $validated['quantity'],
-                'total_price' => $ticketType->price * $validated['quantity'],
+                'total_price' => $totalPrice,
+                'admin_fee' => $adminFee,
                 'payment_status' => 'pending',
                 'payment_method' => 'midtrans',
             ]);

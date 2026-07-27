@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -19,7 +20,7 @@ class OrderController extends Controller
 
     public function showTicket(string $ticketId)
     {
-        $order = Order::where('ticket_id', $ticketId)->firstOrFail();
+        $order = Order::where('ticket_id', $ticketId)->with('ticketType')->firstOrFail();
         return view('ticket.show', ['order' => $order]);
     }
 
@@ -39,9 +40,11 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
-    public function destroy(Order $order)
+    public function downloadTicket(string $ticketId)
     {
-        $order->delete();
-        return response()->json(null, 204);
+        $order = Order::where('ticket_id', $ticketId)->firstOrFail();
+        
+        $pdf = Pdf::loadView('ticket.pdf', ['order' => $order]);
+        
+        return $pdf->download('e-ticket-' . $order->ticket_id . '.pdf');
     }
-}

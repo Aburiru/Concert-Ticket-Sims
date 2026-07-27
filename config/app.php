@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'admin_fee' => (int) env('ADMIN_FEE', 5000),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Mail\ETicketMail;
 use App\Models\Order;
 use App\Models\Payment;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -45,7 +47,11 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        $payment = Payment::create([
+        if ($order->payment_status === 'success') {
+            return response()->json(['message' => 'Notification processed'], 200);
+        }
+
+        Payment::create([
             'order_id' => $order->id,
             'transaction_id' => $transactionId,
             'payment_type' => $paymentType,
@@ -66,6 +72,19 @@ class PaymentController extends Controller
 
         $newOrderStatus = $statusMapping[strtolower($transactionStatus)] ?? $order->payment_status;
         $order->update(['payment_status' => $newOrderStatus]);
+
+        // Send e-ticket email if payment was successful
+        if ($newOrderStatus === 'success') {
+            try {
+                Mail::to($order->email)
+                    ->send(new ETicketMail($order));
+            } catch (\Exception $e) {
+                Log::error('Failed to send e-ticket email', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
 
         Log::info('Midtrans payment processed', [
             'order_id' => $order->id,
