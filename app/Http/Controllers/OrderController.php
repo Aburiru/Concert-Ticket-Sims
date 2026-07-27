@@ -48,3 +48,4 @@ class OrderController extends Controller
         
         return $pdf->download('e-ticket-' . $order->ticket_id . '.pdf');
     }
+}
